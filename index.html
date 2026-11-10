@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shyamkumar S | Full Stack Developer & Platform Engineer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@300;400;600;800&family=Permanent+Marker&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        luffy: {
+                            red: '#ff2a4b',
+                            gold: '#ffb703',
+                            lightning: '#fff3b0',
+                            dark: '#08080c',
+                            aura: 'rgba(255, 183, 3, 0.4)'
+                        },
+                        zoro: {
+                            green: '#00f5d4',
+                            emerald: '#059669',
+                            purple: '#7c3aed',
+                            darkgreen: '#022c22',
+                            dark: '#040b09',
+                            aura: 'rgba(0, 245, 212, 0.4)'
+                        }
+                    },
+                    fontFamily: {
+                        bounty: ['Permanent Marker', 'cursive'],
+                        cinzel: ['Cinzel Decorative', 'serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --accent-color: #ff2a4b;
+            --accent-glow: rgba(255, 42, 75, 0.6);
+        }
+
+        body {
+            background-color: #060609;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(15, 15, 22, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Wanted Poster Style */
+        .wanted-poster {
+            background: #e6d3ad;
+            background-image: radial-gradient(#d3be94 15%, transparent 16%), radial-gradient(#c9a974 15%, transparent 16%);
+            background-size: 18px 18px;
+            background-position: 0 0, 9px 9px;
+            color: #24160c;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.85), inset 0 0 25px rgba(90, 60, 30, 0.45);
+            border: 7px solid #8c6f43;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .wanted-poster::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 40px rgba(40, 25, 10, 0.6);
+            pointer-events: none;
+        }
+
+        .wanted-poster:hover {
+            transform: translateY(-10px) rotate(1.5deg) scale(1.03);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.9);
+        }
+
+        /* Sword Cut Visual Animation Triggered on Scroll */
+        .slash-cut-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .slash-cut-line {
+            position: absolute;
+            height: 4px;
+            width: 140vw;
+            left: -20vw;
+            background: linear-gradient(90deg, transparent, #00f5d4, #ffffff, #7c3aed, transparent);
+            box-shadow: 0 0 25px #00f5d4, 0 0 45px #7c3aed;
+            transform: rotate(-25deg);
+            top: 40%;
+        }
+
+        .theme-luffy .slash-cut-line {
+            background: linear-gradient(90deg, transparent, #ffb703, #ffffff, #ff2a4b, transparent);
+            box-shadow: 0 0 25px #ffb703, 0 0 45px #ff2a4b;
+        }
+
+        /* Text Gradients */
+        .text-gradient-luffy {
+            background: linear-gradient(135deg, #ffffff 0%, #ffb703 40%, #ff2a4b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gradient-zoro {
+            background: linear-gradient(135deg, #ffffff 0%, #00f5d4 50%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Gear 5 / King of Hell Haki Pulse */
+        @keyframes hakiPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.08); }
+        }
+        .animate-haki {
+            animation: hakiPulse 3.5s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060609; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        .theme-luffy ::-webkit-scrollbar-thumb { background: #ff2a4b; }
+        .theme-zoro ::-webkit-scrollbar-thumb { background: #00f5d4; }
+    </style>
+</head>
+<body class="theme-luffy font-sans antialiased selection:bg-luffy-red selection:text-white">
+
+    <!-- Interactive Canvas for Dragging & Scroll Effects -->
+    <canvas id="hakiCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Sword Cut Screen Visual Overlay -->
+    <div id="slashCutOverlay" class="slash-cut-overlay">
+        <div class="slash-cut-line" style="top: 30%; transform: rotate(-18deg);"></div>
+        <div class="slash-cut-line" style="top: 50%; transform: rotate(-25deg);"></div>
+        <div class="slash-cut-line" style="top: 65%; transform: rotate(-15deg);"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="fixed top-0 left-0 w-full z-50 py-4 px-6" id="navbar">
+        <div class="max-w-7xl mx-auto flex items-center justify-between glass-panel px-6 py-3 rounded-full shadow-2xl">
+            <!-- Brand -->
+            <a href="#hero" class="flex items-center gap-3 group">
+                <div id="brandIcon" class="w-10 h-10 rounded-full flex items-center justify-center bg-luffy-gold text-black text-xl font-bold transition-transform duration-500 group-hover:rotate-180 shadow-lg">
+                    <span id="modeEmoji">👒</span>
+                </div>
+                <span class="font-cinzel text-lg tracking-wider font-extrabold text-white">SHYAMKUMAR<span id="brandAccent" class="text-luffy-gold">.S</span></span>
+            </a>
+
+            <!-- Desktop Links -->
+            <nav class="hidden md:flex items-center gap-8 font-semibold text-sm tracking-wide text-gray-300">
+                <a href="#hero" class="hover:text-white transition-colors">Home</a>
+                <a href="#skills" class="hover:text-white transition-colors">Bounties & Skills</a>
+                <a href="#experience" class="hover:text-white transition-colors">Voyage Log</a>
+                <a href="#projects" class="hover:text-white transition-colors">Grand Projects</a>
+                <a href="#education" class="hover:text-white transition-colors">Academics</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+            </nav>
+
+            <!-- Mode Switcher -->
+            <div class="flex items-center gap-4">
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="relative inline-flex items-center justify-between px-4 py-2 rounded-full glass-panel border border-gray-700 hover:border-luffy-gold transition-all duration-300 text-xs font-bold uppercase tracking-wider">
+                    <span id="toggleLabel" class="mr-2 text-luffy-gold">Gear 5 Nika</span>
+                    <span class="w-6 h-6 rounded-full bg-luffy-gold flex items-center justify-center text-black shadow-lg transition-transform duration-300" id="toggleDot">
+                        ⚡
+                    </span>
+                </button>
+
+                <button onclick="toggleMobileMenu()" class="md:hidden text-2xl text-gray-300 focus:outline-none">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden max-w-7xl mx-auto mt-2 glass-panel rounded-2xl p-6 flex flex-col gap-4 text-center text-lg">
+            <a href="#hero" onclick="toggleMobileMenu()" class="hover:text-luffy-gold py-1">Home</a>
+            <a href="#skills" onclick="toggleMobileMenu()" class="hover:text-luffy-gold py-1">Bounties & Skills</a>
+            <a href="#experience" onclick="toggleMobileMenu()" class="hover:text-luffy-gold py-1">Voyage Log</a>
+            <a href="#projects" onclick="toggleMobileMenu()" class="hover:text-luffy-gold py-1">Grand Projects</a>
+            <a href="#education" onclick="toggleMobileMenu()" class="hover:text-luffy-gold py-1">Academics</a>
+            <a href="#contact" onclick="toggleMobileMenu()" class="hover:text-luffy-gold py-1">Contact</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-24">
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="min-h-screen flex items-center justify-center relative px-6 py-12">
+            <div id="heroAura" class="absolute w-96 h-96 md:w-[650px] md:h-[650px] rounded-full bg-luffy-gold/20 blur-[130px] pointer-events-none animate-haki"></div>
+
+            <div class="max-w-5xl mx-auto text-center relative z-10">
+                <!-- Location & Status Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-luffy-gold/40 mb-6">
+                    <span class="w-2.5 h-2.5 rounded-full bg-luffy-gold animate-ping"></span>
+                    <span class="text-xs md:text-sm font-mono tracking-widest text-gray-300 uppercase">Melur, Madurai, TN • Full Stack Developer & Platform Engineer</span>
+                </div>
+
+                <!-- Main Heading -->
+                <h1 class="text-5xl md:text-8xl font-black font-cinzel tracking-tight mb-6">
+                    <span class="block text-white mb-2">SHYAMKUMAR S</span>
+                    <span id="heroSubtitle" class="text-gradient-luffy text-2xl md:text-5xl font-sans font-bold">Captain of Full-Stack Architecture</span>
+                </h1>
+
+                <!-- Summary -->
+                <p class="max-w-3xl mx-auto text-base md:text-lg text-gray-300 leading-relaxed mb-10">
+                    Dedicated Full Stack Developer with 4+ years of experience engineering <strong class="text-white">Node.js, Express, React, MySQL, MongoDB, ElasticSearch, and PHP</strong> platforms. Specialist in high-throughput REST APIs, SWAYAM-NPTEL portal operations, PMRF research workflows, and AI integration.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-5">
+                    <a href="#projects" id="heroBtnPrimary" class="px-8 py-4 rounded-xl bg-luffy-red hover:bg-red-600 text-white font-bold text-lg shadow-lg shadow-luffy-red/40 hover:scale-105 transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-compass"></i> Explore Grand Projects
+                    </a>
+                    <a href="#contact" class="px-8 py-4 rounded-xl glass-panel border border-luffy-gold text-luffy-gold hover:bg-luffy-gold hover:text-black font-bold text-lg hover:scale-105 transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-paper-plane"></i> Send Transponder Signal
+                    </a>
+                </div>
+
+                <!-- Live Metrics Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-16">
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                        <div class="text-3xl md:text-4xl font-extrabold text-luffy-gold mb-1 font-cinzel">4+ Years</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400 font-mono">Development Experience</div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                        <div class="text-3xl md:text-4xl font-extrabold text-luffy-gold mb-1 font-cinzel">80%</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400 font-mono">B.E. CSE (Anna Univ)</div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                        <div class="text-3xl md:text-4xl font-extrabold text-luffy-gold mb-1 font-cinzel">100k+</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400 font-mono">Platform Users Managed</div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                        <div class="text-3xl md:text-4xl font-extrabold text-luffy-gold mb-1 font-cinzel">฿ 6.53B</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400 font-mono">Total Bounty Level</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WANTED BOUNTY BOARD (SKILLS) -->
+        <section id="skills" class="py-24 px-6 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-6xl font-cinzel font-black tracking-wide text-white mb-4">
+                        WANTED BOUNTY BOARD
+                    </h2>
+                    <p class="text-gray-400 font-mono text-sm md:text-base">TECHNICAL MASTERY AUTHORIZED BY NAVY HEADQUARTERS</p>
+                    <div class="w-24 h-1 bg-luffy-gold mx-auto mt-4 rounded-full" id="sectionDivider1"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Poster 1: Platform Operations & PMRF -->
+                    <div class="wanted-poster p-5 rounded-md flex flex-col items-center text-center">
+                        <div class="w-full bg-[#1b120a] text-[#e6d3ad] font-cinzel font-bold text-xl py-1 mb-3 border-b-2 border-t-2 border-[#8c6f43]">
+                            WANTED
+                        </div>
+                        <div class="w-full h-44 bg-[#0d0906] mb-3 flex items-center justify-center relative overflow-hidden border-2 border-[#5c4731]">
+                            <i class="fa-solid fa-graduation-cap text-7xl text-amber-500"></i>
+                            <div class="absolute bottom-2 right-2 text-xs text-gray-400 font-mono">SWAYAM / PMRF</div>
+                        </div>
+                        <h3 class="font-bounty text-2xl tracking-wide mb-1">PLATFORM OPS & PMRF</h3>
+                        <p class="text-xs font-mono font-bold text-[#5c4731] uppercase mb-3">DEAD OR ALIVE</p>
+                        <p class="text-xs font-sans text-gray-900 font-semibold leading-snug mb-4">
+                            SWAYAM-NPTEL & INI course management, booklet setups, PMRF fellowship scoring, paper evaluation tools & domain validation.
+                        </p>
+                        <div class="mt-auto w-full bg-[#24160c] text-[#e6d3ad] font-bounty py-2 text-lg tracking-wider rounded">
+                            ฿ 2,000,000,000
+                        </div>
+                    </div>
+
+                    <!-- Poster 2: Node.js Backend -->
+                    <div class="wanted-poster p-5 rounded-md flex flex-col items-center text-center">
+                        <div class="w-full bg-[#1b120a] text-[#e6d3ad] font-cinzel font-bold text-xl py-1 mb-3 border-b-2 border-t-2 border-[#8c6f43]">
+                            WANTED
+                        </div>
+                        <div class="w-full h-44 bg-[#0d0906] mb-3 flex items-center justify-center relative overflow-hidden border-2 border-[#5c4731]">
+                            <i class="fa-brands fa-node-js text-7xl text-green-600"></i>
+                            <div class="absolute bottom-2 right-2 text-xs text-gray-400 font-mono">NODE / EXPRESS</div>
+                        </div>
+                        <h3 class="font-bounty text-2xl tracking-wide mb-1">NODE.JS BACKEND</h3>
+                        <p class="text-xs font-mono font-bold text-[#5c4731] uppercase mb-3">DEAD OR ALIVE</p>
+                        <p class="text-xs font-sans text-gray-900 font-semibold leading-snug mb-4">
+                            RESTful APIs, microservices, cron jobs, authentication pipelines, PHP legacy refactoring, and scalable networks.
+                        </p>
+                        <div class="mt-auto w-full bg-[#24160c] text-[#e6d3ad] font-bounty py-2 text-lg tracking-wider rounded">
+                            ฿ 1,500,000,000
+                        </div>
+                    </div>
+
+                    <!-- Poster 3: React Frontend -->
+                    <div class="wanted-poster p-5 rounded-md flex flex-col items-center text-center">
+                        <div class="w-full bg-[#1b120a] text-[#e6d3ad] font-cinzel font-bold text-xl py-1 mb-3 border-b-2 border-t-2 border-[#8c6f43]">
+                            WANTED
+                        </div>
+                        <div class="w-full h-44 bg-[#0d0906] mb-3 flex items-center justify-center relative overflow-hidden border-2 border-[#5c4731]">
+                            <i class="fa-brands fa-react text-7xl text-cyan-400"></i>
+                            <div class="absolute bottom-2 right-2 text-xs text-gray-400 font-mono">REACT / JS / BOOTSTRAP</div>
+                        </div>
+                        <h3 class="font-bounty text-2xl tracking-wide mb-1">REACT FRONTEND</h3>
+                        <p class="text-xs font-mono font-bold text-[#5c4731] uppercase mb-3">DEAD OR ALIVE</p>
+                        <p class="text-xs font-sans text-gray-900 font-semibold leading-snug mb-4">
+                            Interactive web interfaces, dynamic analytics dashboards, MIT Scratch integrations, and seamless user experiences.
+                        </p>
+                        <div class="mt-auto w-full bg-[#24160c] text-[#e6d3ad] font-bounty py-2 text-lg tracking-wider rounded">
+                            ฿ 1,200,000,000
+                        </div>
+                    </div>
+
+                    <!-- Poster 4: Databases & ElasticSearch -->
+                    <div class="wanted-poster p-5 rounded-md flex flex-col items-center text-center">
+                        <div class="w-full bg-[#1b120a] text-[#e6d3ad] font-cinzel font-bold text-xl py-1 mb-3 border-b-2 border-t-2 border-[#8c6f43]">
+                            WANTED
+                        </div>
+                        <div class="w-full h-44 bg-[#0d0906] mb-3 flex items-center justify-center relative overflow-hidden border-2 border-[#5c4731]">
+                            <i class="fa-solid fa-database text-7xl text-yellow-500"></i>
+                            <div class="absolute bottom-2 right-2 text-xs text-gray-400 font-mono">MYSQL / MONGO / ELASTIC</div>
+                        </div>
+                        <h3 class="font-bounty text-2xl tracking-wide mb-1">DATABASES & SEARCH</h3>
+                        <p class="text-xs font-mono font-bold text-[#5c4731] uppercase mb-3">DEAD OR ALIVE</p>
+                        <p class="text-xs font-sans text-gray-900 font-semibold leading-snug mb-4">
+                            MySQL schema design, MongoDB document aggregation, ElasticSearch log indexing, and complex query optimizations.
+                        </p>
+                        <div class="mt-auto w-full bg-[#24160c] text-[#e6d3ad] font-bounty py-2 text-lg tracking-wider rounded">
+                            ฿ 950,000,000
+                        </div>
+                    </div>
+
+                    <!-- Poster 5: API & AI Integrations -->
+                    <div class="wanted-poster p-5 rounded-md flex flex-col items-center text-center">
+                        <div class="w-full bg-[#1b120a] text-[#e6d3ad] font-cinzel font-bold text-xl py-1 mb-3 border-b-2 border-t-2 border-[#8c6f43]">
+                            WANTED
+                        </div>
+                        <div class="w-full h-44 bg-[#0d0906] mb-3 flex items-center justify-center relative overflow-hidden border-2 border-[#5c4731]">
+                            <i class="fa-solid fa-bolt text-7xl text-purple-400"></i>
+                            <div class="absolute bottom-2 right-2 text-xs text-gray-400 font-mono">TWILIO / CHATGPT / PAYMENT</div>
+                        </div>
+                        <h3 class="font-bounty text-2xl tracking-wide mb-1">API & AI INTEGRATIONS</h3>
+                        <p class="text-xs font-mono font-bold text-[#5c4731] uppercase mb-3">DEAD OR ALIVE</p>
+                        <p class="text-xs font-sans text-gray-900 font-semibold leading-snug mb-4">
+                            OpenAI ChatGPT API integration, Twilio IVR telephony systems, payment gateways, KYC workflows, and webhooks.
+                        </p>
+                        <div class="mt-auto w-full bg-[#24160c] text-[#e6d3ad] font-bounty py-2 text-lg tracking-wider rounded">
+                            ฿ 880,000,000
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPERIENCE / LOG POSE -->
+        <section id="experience" class="py-24 px-6 relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-6xl font-cinzel font-black tracking-wide text-white mb-4">
+                        VOYAGE LOG POSE
+                    </h2>
+                    <p class="text-gray-400 font-mono text-sm md:text-base">PROFESSIONAL WORK HISTORY</p>
+                    <div class="w-24 h-1 bg-luffy-gold mx-auto mt-4 rounded-full" id="sectionDivider3"></div>
+                </div>
+
+                <div class="relative border-l-2 border-gray-800 ml-4 md:ml-24 space-y-12">
+                    
+                    <!-- Role 1 -->
+                    <div class="relative pl-8 md:pl-12 group">
+                        <div class="absolute -left-4 top-0 w-8 h-8 rounded-full bg-luffy-gold border-4 border-black flex items-center justify-center text-xs text-black font-bold group-hover:scale-125 transition-transform">
+                            ⚓
+                        </div>
+                        <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                            <span class="text-xs font-mono text-luffy-gold uppercase tracking-widest">2 Years Experience</span>
+                            <h3 class="text-2xl font-bold text-white mt-1">Project Associate — NPTEL (Portal Team)</h3>
+                            <p class="text-sm text-gray-400 mb-4">SWAYAM - NPTEL & PMRF Fellowship Management</p>
+                            <ul class="text-sm text-gray-300 space-y-2 list-disc list-inside">
+                                <li>Managed end-to-end SWAYAM-NPTEL & INI courses, including populate configurations, preview setups, and platform updates.</li>
+                                <li>Handled complete PMRF (Prime Minister's Research Fellowship) portfolio, scoring systems, and online/offline paper checking tools.</li>
+                                <li>Executed operational script sequences regularly to maintain platform performance and content monitoring.</li>
+                                <li>Built PMRF Allocation Dashboards and YouTube Views Dashboards for mapping platform view statistics, counts, and trends.</li>
+                                <li>Supervised and automated Domain Certificate checking and verification pipelines.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Role 2 -->
+                    <div class="relative pl-8 md:pl-12 group">
+                        <div class="absolute -left-4 top-0 w-8 h-8 rounded-full bg-luffy-red border-4 border-black flex items-center justify-center text-xs text-white font-bold group-hover:scale-125 transition-transform">
+                            🔥
+                        </div>
+                        <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                            <span class="text-xs font-mono text-luffy-gold uppercase tracking-widest">2 Years Experience</span>
+                            <h3 class="text-2xl font-bold text-white mt-1">Node.js / Full Stack Developer</h3>
+                            <p class="text-sm text-gray-400 mb-4">Enterprise Applications & Microservices</p>
+                            <ul class="text-sm text-gray-300 space-y-2 list-disc list-inside">
+                                <li>Engineered core features for Vehicle Tracking System using Express JS framework and React.</li>
+                                <li>Built Qubits interactive SQL editor, MIT Scratch project manager, and OpenAI ChatGPT AI assistance integration.</li>
+                                <li>Developed SkipQ backend web applications and IVR call processing systems with Node.js, Express, PHP, and Twilio APIs.</li>
+                                <li>Logged call transcripts and metadata into ElasticSearch and managed index operations.</li>
+                                <li>Refactored legacy PHP code to optimize APIs for Digi-Gold mobile app with Node.js and MySQL (Buy, Redeem, Transfer, KYC, Payment, Sell).</li>
+                                <li>Constructed Horeb MLM web application APIs from scratch, tree genealogy algorithms, and cron jobs for auto-calculating level income.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- GRAND LINE PROJECTS -->
+        <section id="projects" class="py-24 px-6 bg-black/50 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-6xl font-cinzel font-black tracking-wide text-white mb-4">
+                        GRAND LINE PROJECTS
+                    </h2>
+                    <p class="text-gray-400 font-mono text-sm md:text-base">PRODUCTION APPLICATIONS & PLATFORMS</p>
+                    <div class="w-24 h-1 bg-luffy-gold mx-auto mt-4 rounded-full" id="sectionDivider2"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Project 1: SWAYAM-NPTEL & PMRF -->
+                    <div class="glass-panel p-6 rounded-3xl border border-gray-800 hover:border-luffy-gold/60 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-mono bg-amber-950/80 text-amber-400 border border-amber-800/50">NPTEL Portal</span>
+                                <i class="fa-solid fa-graduation-cap text-2xl text-luffy-gold group-hover:rotate-12 transition-transform"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-luffy-gold transition-colors">SWAYAM - NPTEL & PMRF Engine</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                                Managed end-to-end SWAYAM-NPTEL & INI courses, booklet configurations, PMRF portfolio scoring workflows, online/offline paper checking tools, and YouTube view analytics dashboards.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">JavaScript</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Operational Scripts</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Analytics</span>
+                            </div>
+                        </div>
+                        <button onclick="openModal('SWAYAM-NPTEL & PMRF Operations', 'Handled end-to-end course setups, booklet configurations, platform updates, and PMRF (Prime Minister\'s Research Fellowship) workflows including scoring algorithms and paper checking tools. Built YouTube view count dashboards and automated domain certificate verification pipelines.')" class="w-full py-2.5 rounded-xl glass-panel border border-gray-700 hover:bg-luffy-gold hover:text-black transition-all font-semibold text-xs">
+                            Inspect Log Specs <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Project 2: Qubits Interactive SQL & Scratch AI -->
+                    <div class="glass-panel p-6 rounded-3xl border border-gray-800 hover:border-luffy-gold/60 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-mono bg-purple-950/80 text-purple-400 border border-purple-800/50">EdTech & AI</span>
+                                <i class="fa-solid fa-brain text-2xl text-purple-400 group-hover:rotate-12 transition-transform"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Qubits SQL Editor & ChatGPT AI</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                                Built an interactive SQL editor enabling users to execute INSERT/SELECT/DELETE queries, integrated MIT Scratch block coding for student projects, and wired OpenAI ChatGPT capabilities.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">React</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Node.js</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">ChatGPT API</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Scratch JS</span>
+                            </div>
+                        </div>
+                        <button onclick="openModal('Qubits SQL & AI Platform', 'Created an interactive web SQL execution sandbox for student database training, seamlessly integrated Scratch programming modules, and embedded ChatGPT AI to serve as an instant coding assistant for learners.')" class="w-full py-2.5 rounded-xl glass-panel border border-gray-700 hover:bg-purple-500 hover:text-white transition-all font-semibold text-xs">
+                            Inspect Log Specs <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Project 3: SkipQ & IVR Twilio System -->
+                    <div class="glass-panel p-6 rounded-3xl border border-gray-800 hover:border-luffy-gold/60 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/80 text-cyan-400 border border-cyan-800/50">Telephony & Search</span>
+                                <i class="fa-solid fa-phone-volume text-2xl text-cyan-400 group-hover:rotate-12 transition-transform"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">SkipQ & IVR Telephony Engine</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                                Developed backend web applications with Twilio APIs to answer and route calls based on voice inputs, managed ElasticSearch index operations, and stored real-time call transcripts.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Node.js</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">ElasticSearch</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Twilio API</span>
+                            </div>
+                        </div>
+                        <button onclick="openModal('SkipQ & IVR Call Platform', 'Engineered interactive voice response (IVR) backend logic using Twilio to capture caller voice inputs and route calls dynamically. Configured ElasticSearch indexing to search call transcripts, recordings, and metadata in real-time.')" class="w-full py-2.5 rounded-xl glass-panel border border-gray-700 hover:bg-cyan-500 hover:text-black transition-all font-semibold text-xs">
+                            Inspect Log Specs <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Project 4: Digi-Gold Mobile App Backend -->
+                    <div class="glass-panel p-6 rounded-3xl border border-gray-800 hover:border-luffy-gold/60 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-mono bg-yellow-950/80 text-yellow-400 border border-yellow-800/50">FinTech</span>
+                                <i class="fa-solid fa-coins text-2xl text-luffy-gold group-hover:rotate-12 transition-transform"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-luffy-gold transition-colors">Digi-Gold FinTech Backend</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                                Built core APIs for Buy, Redeem, Transfer, KYC, Payment, and Sell operations. Refactored legacy PHP scripts into optimized Node.js microservices with MySQL.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Node.js</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">MySQL</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">PHP Refactoring</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">KYC Gateway</span>
+                            </div>
+                        </div>
+                        <button onclick="openModal('Digi-Gold Mobile Backend', 'Integrated third-party payment gateways and instant gold wallet APIs. Modernized legacy PHP infrastructure into high-speed Node.js endpoints with optimized MySQL database indexing for mobile transactions.')" class="w-full py-2.5 rounded-xl glass-panel border border-gray-700 hover:bg-luffy-gold hover:text-black transition-all font-semibold text-xs">
+                            Inspect Log Specs <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Project 5: Vehicle Tracking System -->
+                    <div class="glass-panel p-6 rounded-3xl border border-gray-800 hover:border-luffy-gold/60 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-mono bg-blue-950/80 text-blue-400 border border-blue-800/50">IoT & Tracking</span>
+                                <i class="fa-solid fa-location-dot text-2xl text-blue-400 group-hover:rotate-12 transition-transform"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Vehicle Tracking System</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                                Full-stack vehicle tracking application built with Express.js framework and React to monitor live GPS positions and fleet location metrics.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Express.js</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">React</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Telematics</span>
+                            </div>
+                        </div>
+                        <button onclick="openModal('Vehicle Tracking Telematics System', 'Developed real-time fleet management features, geospatial coordinate logging, and UI dashboards to track movement history, speed limits, and route paths using React and Express JS.')" class="w-full py-2.5 rounded-xl glass-panel border border-gray-700 hover:bg-blue-500 hover:text-white transition-all font-semibold text-xs">
+                            Inspect Log Specs <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- Project 6: Horeb MLM Web Application -->
+                    <div class="glass-panel p-6 rounded-3xl border border-gray-800 hover:border-luffy-gold/60 transition-all duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-mono bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">Enterprise Web App</span>
+                                <i class="fa-solid fa-sitemap text-2xl text-emerald-400 group-hover:rotate-12 transition-transform"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">Horeb MLM Network & Cron Jobs</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                                Built complete user and admin panels for authentication, QR uploads, earnings genealogy tree, and automated level income calculation cron jobs.
+                            </p>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Node.js</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Cron Jobs</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-mono bg-gray-900 text-gray-300">Genealogy Engine</span>
+                            </div>
+                        </div>
+                        <button onclick="openModal('Horeb MLM Web Application', 'Constructed user and admin APIs from scratch for authentication, earnings calculation, tree genealogy visualization, and KYC verification. Automated nightly cron jobs to calculate level income commissions accurately.')" class="w-full py-2.5 rounded-xl glass-panel border border-gray-700 hover:bg-emerald-500 hover:text-black transition-all font-semibold text-xs">
+                            Inspect Log Specs <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ACADEMICS -->
+        <section id="education" class="py-24 px-6 bg-black/40 relative">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-cinzel font-black text-white mb-4">
+                        ACADEMIC QUALIFICATIONS
+                    </h2>
+                    <p class="text-gray-400 font-mono text-sm md:text-base">FORMAL DEGREE & ACADEMIC STANDINGS</p>
+                    <div class="w-24 h-1 bg-luffy-gold mx-auto mt-4 rounded-full" id="sectionDivider4"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-luffy-gold/60 transition-all">
+                        <div class="text-luffy-gold text-3xl mb-3"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <span class="text-xs font-mono text-gray-400">2018 — 2022</span>
+                        <h3 class="text-lg font-bold text-white mt-1">B.E. CSE</h3>
+                        <p class="text-xs text-gray-400 mb-3">Vaigai College of Engineering (Anna Univ)</p>
+                        <div class="inline-block px-3 py-1 rounded-full bg-luffy-gold/20 text-luffy-gold font-mono font-bold text-sm">Score: 80%</div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-luffy-gold/60 transition-all">
+                        <div class="text-luffy-gold text-3xl mb-3"><i class="fa-solid fa-school"></i></div>
+                        <span class="text-xs font-mono text-gray-400">2018</span>
+                        <h3 class="text-lg font-bold text-white mt-1">12th Standard</h3>
+                        <p class="text-xs text-gray-400 mb-3">Subramanya Bharathi Hr. Sec. School</p>
+                        <div class="inline-block px-3 py-1 rounded-full bg-luffy-gold/20 text-luffy-gold font-mono font-bold text-sm">Score: 88%</div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl border border-gray-800 hover:border-luffy-gold/60 transition-all">
+                        <div class="text-luffy-gold text-3xl mb-3"><i class="fa-solid fa-award"></i></div>
+                        <span class="text-xs font-mono text-gray-400">2016</span>
+                        <h3 class="text-lg font-bold text-white mt-1">10th Standard</h3>
+                        <p class="text-xs text-gray-400 mb-3">Subramanya Bharathi Hr. Sec. School</p>
+                        <div class="inline-block px-3 py-1 rounded-full bg-luffy-gold/20 text-luffy-gold font-mono font-bold text-sm">Score: 94.6%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEN DEN MUSHI CONTACT (NO PHONE NUMBER) -->
+        <section id="contact" class="py-24 px-6 bg-black/70 relative">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="w-20 h-20 rounded-full bg-luffy-gold/20 border border-luffy-gold flex items-center justify-center mx-auto mb-6 text-4xl shadow-xl shadow-luffy-gold/20 animate-bounce">
+                    🐌
+                </div>
+                <h2 class="text-4xl md:text-5xl font-cinzel font-black text-white mb-4">
+                    TRANSPONDER SNAIL CONTACT
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto mb-8 text-sm md:text-base">
+                    Direct signal line to Shyamkumar S. Send your job opportunities, freelance projects, or technical queries.
+                </p>
+
+                <!-- Quick Action Buttons (NO PHONE NUMBER) -->
+                <div class="flex flex-wrap items-center justify-center gap-4 mb-10 text-sm font-mono">
+                    <a href="mailto:skshyamten@gmail.com" class="px-5 py-3 rounded-xl glass-panel border border-gray-700 hover:border-luffy-gold text-gray-200 flex items-center gap-3 transition-all">
+                        <i class="fa-solid fa-envelope text-luffy-gold text-lg"></i> skshyamten@gmail.com
+                    </a>
+                    <span class="px-5 py-3 rounded-xl glass-panel border border-gray-700 text-gray-300 flex items-center gap-3">
+                        <i class="fa-solid fa-location-dot text-luffy-red text-lg"></i> Melur, Madurai, Tamil Nadu - 625106
+                    </span>
+                </div>
+
+                <!-- Contact Form with Formspree Endpoint -->
+                <form action="https://formspree.io/f/xgaagyjk" method="POST" onsubmit="handleFormSubmit(event)" class="glass-panel p-8 rounded-3xl border border-gray-800 text-left space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 uppercase mb-2">Your Name / Organization</label>
+                            <input type="text" name="name" required placeholder="e.g. Hiring Manager / Recruiter" class="w-full px-4 py-3 rounded-xl bg-gray-900/80 border border-gray-800 text-white focus:outline-none focus:border-luffy-gold transition-colors text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 uppercase mb-2">Transponder Email</label>
+                            <input type="email" name="_replyto" required placeholder="recruiter@company.com" class="w-full px-4 py-3 rounded-xl bg-gray-900/80 border border-gray-800 text-white focus:outline-none focus:border-luffy-gold transition-colors text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 uppercase mb-2">Message Payload</label>
+                        <textarea name="message" rows="4" required placeholder="Detail your project requirements, technology stack, or interview invite..." class="w-full px-4 py-3 rounded-xl bg-gray-900/80 border border-gray-800 text-white focus:outline-none focus:border-luffy-gold transition-colors text-sm"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-4 rounded-xl bg-luffy-gold text-black hover:bg-yellow-400 font-bold text-base shadow-lg shadow-luffy-gold/30 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Transmit Message Signal
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 px-6 border-t border-gray-900 text-center text-xs text-gray-500 font-mono relative z-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                © 2026 Shyamkumar S. Built with Full-Stack Precision & One Piece Spirit.
+            </div>
+            <div class="flex items-center gap-6 text-base">
+                <a href="mailto:skshyamten@gmail.com" class="hover:text-white transition-colors" title="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Project Modal -->
+    <div id="projectModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6 z-50">
+        <div class="glass-panel max-w-xl w-full p-8 rounded-3xl border border-gray-700 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="modalTitle" class="text-2xl font-bold text-white mb-4 font-cinzel"></h3>
+            <p id="modalBody" class="text-gray-300 text-sm leading-relaxed mb-6"></p>
+            <div class="flex justify-end">
+                <button onclick="closeModal()" class="px-6 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold transition-colors">
+                    Close Log
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 glass-panel px-6 py-4 rounded-2xl border border-luffy-gold text-white text-sm font-mono hidden shadow-2xl z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-luffy-gold text-lg"></i>
+        <span id="toastMsg">Signal transmitted successfully!</span>
+    </div>
+
+    <!-- JavaScript Canvas Physics Engine with Drag Trails & Scroll Slashes -->
+    <script>
+        let currentMode = 'luffy'; 
+        const canvas = document.getElementById('hakiCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let slashes = [];
+        let isMouseDown = false;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 3;
+                this.speedY = (Math.random() - 0.5) * 3;
+                this.color = color;
+                this.alpha = Math.random() * 0.7 + 0.3;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class ZoroSlash {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.length = Math.random() * 180 + 120;
+                this.angle = (Math.random() * 50 - 25) * (Math.PI / 180);
+                this.life = 1.0;
+                this.color = currentMode === 'luffy' ? '#ff2a4b' : '#00f5d4';
+                this.secondaryColor = currentMode === 'luffy' ? '#ffb703' : '#7c3aed';
+            }
+
+            update() {
+                this.life -= 0.035;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 4 * this.life;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = this.color;
+                
+                // Blade 1
+                ctx.beginPath();
+                ctx.moveTo(this.x - Math.cos(this.angle) * (this.length / 2), this.y - Math.sin(this.angle) * (this.length / 2));
+                ctx.lineTo(this.x + Math.cos(this.angle) * (this.length / 2), this.y + Math.sin(this.angle) * (this.length / 2));
+                ctx.stroke();
+
+                // Blade 2 (Three-Sword Style)
+                ctx.strokeStyle = this.secondaryColor;
+                ctx.lineWidth = 2.5 * this.life;
+                ctx.beginPath();
+                ctx.moveTo(this.x - Math.cos(this.angle) * (this.length / 2) + 16, this.y - Math.sin(this.angle) * (this.length / 2) - 16);
+                ctx.lineTo(this.x + Math.cos(this.angle) * (this.length / 2) + 16, this.y + Math.sin(this.angle) * (this.length / 2) - 16);
+                ctx.stroke();
+
+                // Blade 3
+                ctx.beginPath();
+                ctx.moveTo(this.x - Math.cos(this.angle) * (this.length / 2) - 16, this.y - Math.sin(this.angle) * (this.length / 2) + 16);
+                ctx.lineTo(this.x + Math.cos(this.angle) * (this.length / 2) - 16, this.y + Math.sin(this.angle) * (this.length / 2) + 16);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.floor(window.innerWidth / 16);
+            const color = currentMode === 'luffy' ? '#ffb703' : '#00f5d4';
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(null, null, color));
+            }
+        }
+        initParticles();
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            slashes.forEach((slash, idx) => {
+                slash.update();
+                slash.draw();
+                if (slash.life <= 0) slashes.splice(idx, 1);
+            });
+
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // Mouse Drag & Movement Slash/Haki Sparks
+        window.addEventListener('mousedown', () => { isMouseDown = true; });
+        window.addEventListener('mouseup', () => { isMouseDown = false; });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isMouseDown || Math.random() < 0.25) {
+                const color = currentMode === 'luffy' ? '#ff2a4b' : '#00f5d4';
+                particles.push(new Particle(e.clientX, e.clientY, color));
+                if (particles.length > 160) particles.shift();
+                
+                if (isMouseDown) {
+                    slashes.push(new ZoroSlash(e.clientX, e.clientY));
+                }
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            const color = currentMode === 'luffy' ? '#ff2a4b' : '#7c3aed';
+            for (let i = 0; i < 8; i++) {
+                particles.push(new Particle(e.clientX, e.clientY, color));
+            }
+            slashes.push(new ZoroSlash(e.clientX, e.clientY));
+        });
+
+        // Trigger Screen Cut Overlay on Scroll
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            if (Math.abs(window.scrollY - lastScrollY) > 180) {
+                lastScrollY = window.scrollY;
+                triggerSlashOverlay();
+            }
+        });
+
+        function triggerSlashOverlay() {
+            const overlay = document.getElementById('slashCutOverlay');
+            overlay.style.opacity = '1';
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+            }, 300);
+
+            // Add random blade slash on screen
+            slashes.push(new ZoroSlash(window.innerWidth * Math.random(), window.innerHeight * Math.random()));
+        }
+
+        // Mode Switcher Engine
+        function toggleTheme() {
+            const body = document.body;
+            const toggleDot = document.getElementById('toggleDot');
+            const toggleLabel = document.getElementById('toggleLabel');
+            const modeEmoji = document.getElementById('modeEmoji');
+            const brandAccent = document.getElementById('brandAccent');
+            const heroSubtitle = document.getElementById('heroSubtitle');
+            const heroAura = document.getElementById('heroAura');
+            const heroBtn = document.getElementById('heroBtnPrimary');
+            const dividers = [
+                document.getElementById('sectionDivider1'), 
+                document.getElementById('sectionDivider2'), 
+                document.getElementById('sectionDivider3'),
+                document.getElementById('sectionDivider4')
+            ];
+
+            if (currentMode === 'luffy') {
+                currentMode = 'zoro';
+                body.className = 'theme-zoro font-sans antialiased selection:bg-zoro-green selection:text-black';
+                toggleDot.innerHTML = '⚔️';
+                toggleDot.className = 'w-6 h-6 rounded-full bg-zoro-green text-black flex items-center justify-center transition-transform duration-300 translate-x-1';
+                toggleLabel.innerText = 'Zoro King of Hell';
+                toggleLabel.className = 'mr-2 text-zoro-green';
+                modeEmoji.innerText = '⚔️';
+                brandAccent.className = 'text-zoro-green';
+
+                heroSubtitle.innerText = 'Master of Three-Sword Precision & Platform Operations';
+                heroSubtitle.className = 'text-gradient-zoro text-2xl md:text-5xl font-sans font-bold';
+                heroAura.className = 'absolute w-96 h-96 md:w-[650px] md:h-[650px] rounded-full bg-zoro-green/20 blur-[130px] pointer-events-none animate-haki';
+                heroBtn.className = 'px-8 py-4 rounded-xl bg-zoro-green hover:bg-emerald-400 text-black font-bold text-lg shadow-lg shadow-zoro-green/40 hover:scale-105 transition-all flex items-center gap-3';
+                dividers.forEach(d => { if(d) d.className = 'w-24 h-1 bg-zoro-green mx-auto mt-4 rounded-full'; });
+            } else {
+                currentMode = 'luffy';
+                body.className = 'theme-luffy font-sans antialiased selection:bg-luffy-red selection:text-white';
+                toggleDot.innerHTML = '⚡';
+                toggleDot.className = 'w-6 h-6 rounded-full bg-luffy-gold text-black flex items-center justify-center transition-transform duration-300';
+                toggleLabel.innerText = 'Gear 5 Nika';
+                toggleLabel.className = 'mr-2 text-luffy-gold';
+                modeEmoji.innerText = '👒';
+                brandAccent.className = 'text-luffy-gold';
+
+                heroSubtitle.innerText = 'Captain of Full-Stack Architecture';
+                heroSubtitle.className = 'text-gradient-luffy text-2xl md:text-5xl font-sans font-bold';
+                heroAura.className = 'absolute w-96 h-96 md:w-[650px] md:h-[650px] rounded-full bg-luffy-gold/20 blur-[130px] pointer-events-none animate-haki';
+                heroBtn.className = 'px-8 py-4 rounded-xl bg-luffy-red hover:bg-red-600 text-white font-bold text-lg shadow-lg shadow-luffy-red/40 hover:scale-105 transition-all flex items-center gap-3';
+                dividers.forEach(d => { if(d) d.className = 'w-24 h-1 bg-luffy-gold mx-auto mt-4 rounded-full'; });
+            }
+
+            initParticles();
+            triggerSlashOverlay();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function openModal(title, body) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerText = body;
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleFormSubmit(e) {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
